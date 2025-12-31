@@ -13,19 +13,33 @@
 </head>
 <body>
 
+<div id="conteudo">Carregando...</div>
+
 <script>
-  fetch("https://api.ipify.org?format=json")
-    .then(res => res.json())
-    .then(data => {
-      const ip = data.ip;
-      window.location.replace(
-        "https://script.google.com/macros/s/AKfycbyuZWEnZXHm3k3QJYpg_6-2LCfBv8fw5d4Xn-mkObBJA9IQa3UaD25f2zcNVClXu1O1Hw/exec?ip=" 
-        + encodeURIComponent(ip)
-      );
-    })
-    .catch(() => {
-      // em caso extremo, não mostra nada
-    });
+(async function () {
+  try {
+    // 1. Captura o IP do usuário
+    const ipResponse = await fetch("https://api.ipify.org?format=json");
+    const ipData = await ipResponse.json();
+    const ip = ipData.ip;
+
+    // 2. Monta a URL da página final com o IP
+    const url =
+      "https://script.google.com/macros/s/AKfycby-d0ZKlSAAY9esjZe3L3CR9ZDk2vu3E2XMUaRiFzoufTMRrhPym9hWowq5fncAEhLB9w/exec?ip=" +
+      encodeURIComponent(ip);
+
+    // 3. Busca o HTML da página final
+    const pageResponse = await fetch(url);
+    const html = await pageResponse.text();
+
+    // 4. Injeta o HTML dentro desta página
+    document.getElementById("conteudo").innerHTML = html;
+
+  } catch (e) {
+    // fallback silencioso
+    document.getElementById("conteudo").innerText = "";
+  }
+})();
 </script>
 
 </body>
